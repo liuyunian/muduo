@@ -23,10 +23,6 @@ namespace muduo
 class Timestamp : public muduo::copyable,                                                   // 继承copyable类 -- 标记类
                   public boost::equality_comparable<Timestamp>,                             // 继承boost::equality_comparable，要求实现==操作符函数，并自动提供!=
                   public boost::less_than_comparable<Timestamp>                             // 继承boost::less_than_comparable，要求实现<操作符函数，并自动实现> <= >=操作符函数
-                                                                                            /**
-                                                                                             * 关于equality_comparable和less_than_comparable有大学问
-                                                                                             * https://www.cnblogs.com/youxin/p/5610374.html
-                                                                                            */
 {
  public:
   ///
@@ -54,11 +50,11 @@ class Timestamp : public muduo::copyable,                                       
   // default copy/assignment/dtor are Okay 													-- 采用默认拷贝构造函数、默认赋值运算符函数、析构函数；dtor是destructor简写
 
   string toString() const;																	// 转换成字符串，字符串格式：秒数.6位微秒
-  string toFormattedString(bool showMicroseconds = true) const;								// 转化成格式化字符串，字符串格式：
+  string toFormattedString(bool showMicroseconds = true) const;								// 转化成格式化字符串，字符串格式：yyyymmddd hh:mm:ss(.ms)，可选是否显示微秒
 
-  bool valid() const { return microSecondsSinceEpoch_ > 0; }
+  bool valid() const { return microSecondsSinceEpoch_ > 0; }								// 判断时间戳是否有效 > 0
 
-  // for internal usage.
+  // for internal usage.																	-- 内部使用？？？
   int64_t microSecondsSinceEpoch() const { return microSecondsSinceEpoch_; }
   time_t secondsSinceEpoch() const
   { return static_cast<time_t>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond); }
@@ -66,7 +62,7 @@ class Timestamp : public muduo::copyable,                                       
   ///
   /// Get time of now.
   ///
-  static Timestamp now();
+  static Timestamp now();																	// 获取当前时间
   static Timestamp invalid()
   {
     return Timestamp();

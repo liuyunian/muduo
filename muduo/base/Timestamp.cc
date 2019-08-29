@@ -17,7 +17,8 @@
 using namespace muduo;
 
 static_assert(sizeof(Timestamp) == sizeof(int64_t),
-              "Timestamp is same size as int64_t");
+              "Timestamp is same size as int64_t");											// assert断言编程，运行时断言；static_assert静态断言，编译期间做判断
+			  																				// static_assert(常量表达式, 提示字符串);
 
 string Timestamp::toString() const
 {
@@ -55,7 +56,7 @@ string Timestamp::toFormattedString(bool showMicroseconds) const
 Timestamp Timestamp::now()
 {
   struct timeval tv;
-  gettimeofday(&tv, NULL);
+  gettimeofday(&tv, NULL);																	// gettimeofday()获取当前的时间
   int64_t seconds = tv.tv_sec;
   return Timestamp(seconds * kMicroSecondsPerSecond + tv.tv_usec);
 }
