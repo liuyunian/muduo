@@ -5,14 +5,14 @@
 
 #include "muduo/base/Timestamp.h"
 
-#include <sys/time.h>
+#include <sys/time.h>																		// gmtime_r
 #include <stdio.h>
 
 #ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS																// C++中使用PRId64的话必须要#define__STDC_FORMAT_MACROS
 #endif
 
-#include <inttypes.h>
+#include <inttypes.h>																		// PRId64
 
 using namespace muduo;
 
@@ -21,19 +21,19 @@ static_assert(sizeof(Timestamp) == sizeof(int64_t),
 
 string Timestamp::toString() const
 {
-  char buf[32] = {0};
+  char buf[32] = {0};																		// 表示微秒占6个字符，dot占一个字符，末尾的/0占一个字符，所以秒部分最多占24个字符，完全足够使用了
   int64_t seconds = microSecondsSinceEpoch_ / kMicroSecondsPerSecond;
   int64_t microseconds = microSecondsSinceEpoch_ % kMicroSecondsPerSecond;
-  snprintf(buf, sizeof(buf)-1, "%" PRId64 ".%06" PRId64 "", seconds, microseconds);
-  return buf;
+  snprintf(buf, sizeof(buf)-1, "%" PRId64 ".%06" PRId64 "", seconds, microseconds);			// PRId64: int64_t表示64位有符号整数，在32位系统上是long long，在64位系统中是long，所以在32位系统中打印的格式是%lld，在64位系统中打印格式位%ld
+  return buf;																				// 所以如果要跨平台打印in64_t就要使用一个统一的格式，也就是这里的PRId64z，其本质是字符串"lld"(32bit) or "ld"(64bit)
 }
 
 string Timestamp::toFormattedString(bool showMicroseconds) const
 {
   char buf[64] = {0};
-  time_t seconds = static_cast<time_t>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond);
-  struct tm tm_time;
-  gmtime_r(&seconds, &tm_time);
+  time_t seconds = static_cast<time_t>(microSecondsSinceEpoch_ / kMicroSecondsPerSecond); 	// time_t本质是long int
+  struct tm tm_time;																		// 用于保存时间和日期
+  gmtime_r(&seconds, &tm_time);																// 将time_t类型表示的时间分解填充到struct tm结构中，与之类似的gmtime(const time_t * timer)函数，不用提供自行定义的struct tm对象
 
   if (showMicroseconds)
   {

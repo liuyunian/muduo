@@ -15,14 +15,18 @@ namespace muduo
 {
 
 ///
-/// Time stamp in UTC, in microseconds resolution.
+/// Time stamp in UTC, in microseconds resolution.                                          -- UTC：世界统一时间、世界标准时间
 ///
-/// This class is immutable.
-/// It's recommended to pass it by value, since it's passed in register on x64.
+/// This class is immutable.                                                                -- 不变的
+/// It's recommended to pass it by value, since it's passed in register on x64.             // 建议按值传递，因为在64位机器上它是在寄存器中传递的
 ///
-class Timestamp : public muduo::copyable,
-                  public boost::equality_comparable<Timestamp>,
-                  public boost::less_than_comparable<Timestamp>
+class Timestamp : public muduo::copyable,                                                   // 继承copyable类 -- 标记类
+                  public boost::equality_comparable<Timestamp>,                             // 继承boost::equality_comparable，要求实现==操作符函数，并自动提供!=
+                  public boost::less_than_comparable<Timestamp>                             // 继承boost::less_than_comparable，要求实现<操作符函数，并自动实现> <= >=操作符函数
+                                                                                            /**
+                                                                                             * 关于equality_comparable和less_than_comparable有大学问
+                                                                                             * https://www.cnblogs.com/youxin/p/5610374.html
+                                                                                            */
 {
  public:
   ///
@@ -42,15 +46,15 @@ class Timestamp : public muduo::copyable,
   {
   }
 
-  void swap(Timestamp& that)
+  void swap(Timestamp& that)																// 对象交换
   {
     std::swap(microSecondsSinceEpoch_, that.microSecondsSinceEpoch_);
   }
 
-  // default copy/assignment/dtor are Okay
+  // default copy/assignment/dtor are Okay 													-- 采用默认拷贝构造函数、默认赋值运算符函数、析构函数；dtor是destructor简写
 
-  string toString() const;
-  string toFormattedString(bool showMicroseconds = true) const;
+  string toString() const;																	// 转换成字符串，字符串格式：秒数.6位微秒
+  string toFormattedString(bool showMicroseconds = true) const;								// 转化成格式化字符串，字符串格式：
 
   bool valid() const { return microSecondsSinceEpoch_ > 0; }
 
@@ -81,7 +85,7 @@ class Timestamp : public muduo::copyable,
   static const int kMicroSecondsPerSecond = 1000 * 1000;
 
  private:
-  int64_t microSecondsSinceEpoch_;
+  int64_t microSecondsSinceEpoch_;														 	// 自1970.01.01-00:00:00到指定时间的微秒数
 };
 
 inline bool operator<(Timestamp lhs, Timestamp rhs)
