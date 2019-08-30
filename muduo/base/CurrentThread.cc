@@ -12,9 +12,9 @@
 namespace muduo
 {
 namespace CurrentThread
-{
-__thread int t_cachedTid = 0;
-__thread char t_tidString[32];
+{                                                                                   // __thread是GCC内置的线程局部存储设施，__thread修饰的变量在每个线程中都有独立的一份，线程之间互不干扰     
+__thread int t_cachedTid = 0;                                                       // 用来存放线程tid
+__thread char t_tidString[32];                                                      // 
 __thread int t_tidStringLength = 6;
 __thread const char* t_threadName = "unknown";
 static_assert(std::is_same<int, pid_t>::value, "pid_t should be int");

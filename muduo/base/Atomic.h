@@ -53,7 +53,7 @@ class AtomicIntegerT : noncopyable                                          // �
     return getAndAdd(x) + x;
   }
 
-  T incrementAndGet()
+  T incrementAndGet()                                                           // 先加1后返回值
   {
     return addAndGet(1);
   }

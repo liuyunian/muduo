@@ -23,9 +23,16 @@ namespace muduo
 namespace detail
 {
 
-pid_t gettid()
+/**
+在linux下每一个进程都一个进程id，类型pid_t，可以由getpid（）获取
+POSIX线程也有线程id，类型pthread_t，可以由pthread_self（）获取，线程id由线程库维护。但是各个进程独立，所以会有不同进程中线程号相同节的情况
+那么这样就会存在一个问题，我的进程p1中的线程t1要与进程p2中的线程t2通信怎么办，进程id不可以，线程id又可能重复，所以这里会有一个真实的线程id唯一标识，tid。
+glibc没有实现gettid的函数，所以我们可以通过linux下的系统调用syscall(SYS_gettid)来获得
+*/
+
+pid_t gettid()                                                                          // 获取真实的线程id
 {
-  return static_cast<pid_t>(::syscall(SYS_gettid));
+  return static_cast<pid_t>(::syscall(SYS_gettid));                                     // 使用syscall(SYS_gettid)获取线程真实的id    
 }
 
 void afterFork()
@@ -49,10 +56,10 @@ class ThreadNameInitializer
 
 ThreadNameInitializer init;
 
-struct ThreadData
+struct ThreadData                                                                       // 线程数据结构，作为pthread_create()参数，线程入口函数的参数
 {
-  typedef muduo::Thread::ThreadFunc ThreadFunc;
-  ThreadFunc func_;
+  typedef muduo::Thread::ThreadFunc ThreadFunc;                             
+  ThreadFunc func_;                                                                     
   string name_;
   pid_t* tid_;
   CountDownLatch* latch_;
@@ -67,7 +74,7 @@ struct ThreadData
       latch_(latch)
   { }
 
-  void runInThread()
+  void runInThread()                                                                    // 从该函数中执行线程任务函数func_
   {
     *tid_ = muduo::CurrentThread::tid();
     tid_ = NULL;
@@ -137,7 +144,7 @@ void CurrentThread::sleepUsec(int64_t usec)
   ::nanosleep(&ts, NULL);
 }
 
-AtomicInt32 Thread::numCreated_;
+AtomicInt32 Thread::numCreated_;                                                            // 静态成员变量numCreated_初始化                   
 
 Thread::Thread(ThreadFunc func, const string& n)
   : started_(false),
@@ -159,13 +166,13 @@ Thread::~Thread()
   }
 }
 
-void Thread::setDefaultName()
+void Thread::setDefaultName()                                                               // 设置线程默认名字
 {
   int num = numCreated_.incrementAndGet();
   if (name_.empty())
   {
     char buf[32];
-    snprintf(buf, sizeof buf, "Thread%d", num);
+    snprintf(buf, sizeof buf, "Thread%d", num);                                             // sizeof可以不加括号使用吗，线程默认名的给格式：Thread1、Thread2...
     name_ = buf;
   }
 }
@@ -176,13 +183,13 @@ void Thread::start()
   started_ = true;
   // FIXME: move(func_)
   detail::ThreadData* data = new detail::ThreadData(func_, name_, &tid_, &latch_);
-  if (pthread_create(&pthreadId_, NULL, &detail::startThread, data))
+  if (pthread_create(&pthreadId_, NULL, &detail::startThread, data))                        // 创建线程，采用默认线程属性
   {
     started_ = false;
     delete data; // or no delete?
     LOG_SYSFATAL << "Failed in pthread_create";
   }
-  else
+  else                                                                                      // 
   {
     latch_.wait();
     assert(tid_ > 0);

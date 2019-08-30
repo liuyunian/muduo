@@ -10,18 +10,18 @@
 
 namespace muduo
 {
-namespace CurrentThread
+namespace CurrentThread                             // CurrentThread命名空间，这里使用有点像类，.h文件中声明函数，源文件中定义函数，注意这里的函数定义分散在不同的源文件中
 {
-  // internal
+  // internal                                       -- 内部使用
   extern __thread int t_cachedTid;
   extern __thread char t_tidString[32];
   extern __thread int t_tidStringLength;
   extern __thread const char* t_threadName;
-  void cacheTid();
+  void cacheTid();                                  // 缓存tid，函数在Thread.cc中定义 
 
   inline int tid()
   {
-    if (__builtin_expect(t_cachedTid == 0, 0))
+    if (__builtin_expect(t_cachedTid == 0, 0))      // __builtin_expect(long)  
     {
       cacheTid();
     }
