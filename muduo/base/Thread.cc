@@ -13,7 +13,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/prctl.h>
+#include <sys/prctl.h>                                                                  // prctl
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <linux/unistd.h>
@@ -43,7 +43,7 @@ void afterFork()
   // no need to call pthread_atfork(NULL, NULL, &afterFork);
 }
 
-class ThreadNameInitializer
+class ThreadNameInitializer                                                             // 用于多线程中fork子进程的情况
 {
  public:
   ThreadNameInitializer()
@@ -76,13 +76,13 @@ struct ThreadData                                                               
 
   void runInThread()                                                                    // 从该函数中执行线程任务函数func_
   {
-    *tid_ = muduo::CurrentThread::tid();
-    tid_ = NULL;
-    latch_->countDown();
-    latch_ = NULL;
+    *tid_ = muduo::CurrentThread::tid();                                                // 获取当前线程的tid，存放在Thread成员变量tid_中
+    tid_ = NULL;                                                                        // ThreadData结构中的指针成员tid_置为空指针
+    latch_->countDown();                                                                // ??
+    latch_ = NULL;                                                                      // ??
 
-    muduo::CurrentThread::t_threadName = name_.empty() ? "muduoThread" : name_.c_str();
-    ::prctl(PR_SET_NAME, muduo::CurrentThread::t_threadName);
+    muduo::CurrentThread::t_threadName = name_.empty() ? "muduoThread" : name_.c_str(); // 这里的name_怎么会为空呢？？在此之前muduo::CurrentThread::t_threadName为unknown
+    ::prctl(PR_SET_NAME, muduo::CurrentThread::t_threadName);                           // 设置进程的名字为t_hreadName
     try
     {
       func_();
@@ -116,7 +116,7 @@ void* startThread(void* obj)
 {
   ThreadData* data = static_cast<ThreadData*>(obj);
   data->runInThread();
-  delete data;
+  delete data;                                                                              // data是new出来的，所以要delete
   return NULL;
 }
 
@@ -126,14 +126,14 @@ void CurrentThread::cacheTid()
 {
   if (t_cachedTid == 0)
   {
-    t_cachedTid = detail::gettid();
-    t_tidStringLength = snprintf(t_tidString, sizeof t_tidString, "%5d ", t_cachedTid);
+    t_cachedTid = detail::gettid();                                                         // 通过gettid获取真实的线程id -- tid
+    t_tidStringLength = snprintf(t_tidString, sizeof t_tidString, "%5d ", t_cachedTid);     // tid的字符串形式
   }
 }
 
 bool CurrentThread::isMainThread()
 {
-  return tid() == ::getpid();
+  return tid() == ::getpid();                                                               // 线程tid == 进程id，那么该线程为主线程
 }
 
 void CurrentThread::sleepUsec(int64_t usec)
@@ -162,7 +162,7 @@ Thread::~Thread()
 {
   if (started_ && !joined_)
   {
-    pthread_detach(pthreadId_);
+    pthread_detach(pthreadId_);                                                             // 线程分离，由系统回收线程资源
   }
 }
 
@@ -183,16 +183,16 @@ void Thread::start()
   started_ = true;
   // FIXME: move(func_)
   detail::ThreadData* data = new detail::ThreadData(func_, name_, &tid_, &latch_);
-  if (pthread_create(&pthreadId_, NULL, &detail::startThread, data))                        // 创建线程，采用默认线程属性
+  if (pthread_create(&pthreadId_, NULL, &detail::startThread, data))                        // 创建线程，采用默认线程属性，创建成功返回0，否则返回错误码
   {
     started_ = false;
     delete data; // or no delete?
     LOG_SYSFATAL << "Failed in pthread_create";
   }
-  else                                                                                      // 
+  else                                                                                      // 线程创建成功
   {
-    latch_.wait();
-    assert(tid_ > 0);
+    latch_.wait();                                                                          // ??
+    assert(tid_ > 0);                                                                       // 线程创建成功之后，tid_必然 > 0
   }
 }
 

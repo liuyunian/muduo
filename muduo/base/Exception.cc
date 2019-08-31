@@ -11,7 +11,7 @@ namespace muduo
 
 Exception::Exception(string msg)
   : message_(std::move(msg)),
-    stack_(CurrentThread::stackTrace(/*demangle=*/false))
+    stack_(CurrentThread::stackTrace(/*demangle=*/false)) // 异常发生时的堆栈信息通过CurrentThread命名空间下的stackTrace()函数获取
 {
 }
 

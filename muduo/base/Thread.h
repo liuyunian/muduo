@@ -31,7 +31,7 @@ class Thread : noncopyable                                      // 封装线程�
 
   bool started() const { return started_; }
   // pthread_t pthreadId() const { return pthreadId_; }
-  pid_t tid() const { return tid_; }                            // 
+  pid_t tid() const { return tid_; }
   const string& name() const { return name_; }
 
   static int numCreated() { return numCreated_.get(); }
