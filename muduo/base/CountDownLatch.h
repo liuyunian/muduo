@@ -12,22 +12,22 @@
 namespace muduo
 {
 
-class CountDownLatch : noncopyable
+class CountDownLatch : noncopyable              // 倒计时门闩类，两种用法：用于所有子线程等待主线程发起“开始运行命令”；或者用于主线程等待子线程初始化完毕再继续运行
 {
  public:
 
-  explicit CountDownLatch(int count);
+  explicit CountDownLatch(int count);           // 初始化传入一个计数器
 
-  void wait();
+  void wait();                                  // 等待计数器减为0
 
-  void countDown();
+  void countDown();                             // 计数器减1
 
-  int getCount() const;
+  int getCount() const;                         // 获取计数器的值
 
  private:
   mutable MutexLock mutex_;
   Condition condition_ GUARDED_BY(mutex_);
-  int count_ GUARDED_BY(mutex_);
+  int count_ GUARDED_BY(mutex_);                // 计数器
 };
 
 }  // namespace muduo

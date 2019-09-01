@@ -11,17 +11,17 @@
 #include <assert.h>
 #include <pthread.h>
 
-// Thread safety annotations {
+// Thread safety annotations {                                                              -- 线程安全注释
 // https://clang.llvm.org/docs/ThreadSafetyAnalysis.html
 
-// Enable thread safety attributes only with clang.
-// The attributes can be safely erased when compiling with other compilers.
-#if defined(__clang__) && (!defined(SWIG))
-#define THREAD_ANNOTATION_ATTRIBUTE__(x)   __attribute__((x))
+// Enable thread safety attributes only with clang.                                         -- 只有使用clang编译才能使用线程安全属性
+// The attributes can be safely erased when compiling with other compilers.                 -- 下面的条件编译，使用其他编译器时可以安全的擦除线程安全属性
+#if defined(__clang__) && (!defined(SWIG))                                                  // 如果定义了__clang__表示使用clang编译器，并且没有定义SWIG ??
+#define THREAD_ANNOTATION_ATTRIBUTE__(x)   __attribute__((x))                               // __attribute__可以用来设置函数属性、变量属性和类型属性，格式：__attribute__(attribute-list)
 #else
 #define THREAD_ANNOTATION_ATTRIBUTE__(x)   // no-op
 #endif
-
+                                                                                            // 定义诸多属性
 #define CAPABILITY(x) \
   THREAD_ANNOTATION_ATTRIBUTE__(capability(x))
 
@@ -100,7 +100,7 @@ __END_DECLS
 #else  // CHECK_PTHREAD_RETURN_VALUE
 
 #define MCHECK(ret) ({ __typeof__ (ret) errnum = (ret);         \
-                       assert(errnum == 0); (void) errnum;})
+                       assert(errnum == 0); (void) errnum;})                                // 检查是否为0，用于对pthread_mutex_init...返回值的检查
 
 #endif // CHECK_PTHREAD_RETURN_VALUE
 
@@ -118,7 +118,7 @@ namespace muduo
 //   mutable MutexLock mutex_;
 //   std::vector<int> data_ GUARDED_BY(mutex_);
 // };
-class CAPABILITY("mutex") MutexLock : noncopyable
+class CAPABILITY("mutex") MutexLock : noncopyable                                           // 对pthread_mutex进行封装
 {
  public:
   MutexLock()
@@ -133,26 +133,26 @@ class CAPABILITY("mutex") MutexLock : noncopyable
     MCHECK(pthread_mutex_destroy(&mutex_));
   }
 
-  // must be called when locked, i.e. for assertion
-  bool isLockedByThisThread() const
+  // must be called when locked, i.e. for assertion                                         -- 在加锁时必须调用
+  bool isLockedByThisThread() const                                                         // 判断是否是当前线程对互斥量加锁
   {
     return holder_ == CurrentThread::tid();
   }
 
-  void assertLocked() const ASSERT_CAPABILITY(this)
+  void assertLocked() const ASSERT_CAPABILITY(this)                                         // 断言是当前线程对互斥量加锁
   {
     assert(isLockedByThisThread());
   }
 
   // internal usage
 
-  void lock() ACQUIRE()
+  void lock() ACQUIRE()                                                                     // 加锁
   {
     MCHECK(pthread_mutex_lock(&mutex_));
     assignHolder();
   }
 
-  void unlock() RELEASE()
+  void unlock() RELEASE()                                                                   // 解锁
   {
     unassignHolder();
     MCHECK(pthread_mutex_unlock(&mutex_));
@@ -164,9 +164,9 @@ class CAPABILITY("mutex") MutexLock : noncopyable
   }
 
  private:
-  friend class Condition;
+  friend class Condition;                                                                   // 友元类Condition
 
-  class UnassignGuard : noncopyable
+  class UnassignGuard : noncopyable                                                         // 未分配守护类，有什么用呢？
   {
    public:
     explicit UnassignGuard(MutexLock& owner)
@@ -195,7 +195,7 @@ class CAPABILITY("mutex") MutexLock : noncopyable
   }
 
   pthread_mutex_t mutex_;
-  pid_t holder_;
+  pid_t holder_;                                                                            // 记录持有该锁的线程tid
 };
 
 // Use as a stack variable, eg.
@@ -204,7 +204,7 @@ class CAPABILITY("mutex") MutexLock : noncopyable
 //   MutexLockGuard lock(mutex_);
 //   return data_.size();
 // }
-class SCOPED_CAPABILITY MutexLockGuard : noncopyable
+class SCOPED_CAPABILITY MutexLockGuard : noncopyable                                        // 同C++11中std::lock_guard，采用RAII技法封装，目的是防止互斥量忘记解锁
 {
  public:
   explicit MutexLockGuard(MutexLock& mutex) ACQUIRE(mutex)
@@ -226,8 +226,8 @@ class SCOPED_CAPABILITY MutexLockGuard : noncopyable
 }  // namespace muduo
 
 // Prevent misuse like:
-// MutexLockGuard(mutex_);
-// A tempory object doesn't hold the lock for long!
-#define MutexLockGuard(x) error "Missing guard object name"
+// MutexLockGuard(mutex_);                                                                  -- 不允许这样匿名错误的用法
+// A tempory object doesn't hold the lock for long!                                         -- 一个匿名对象不能长时间持有锁
+#define MutexLockGuard(x) error "Missing guard object name"                                 // 宏定义，编译会出错
 
 #endif  // MUDUO_BASE_MUTEX_H

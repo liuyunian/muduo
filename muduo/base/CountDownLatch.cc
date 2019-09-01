@@ -27,7 +27,7 @@ void CountDownLatch::countDown()
 {
   MutexLockGuard lock(mutex_);
   --count_;
-  if (count_ == 0)
+  if (count_ == 0)                                          // 当计数器减为0唤醒所有等待的线程
   {
     condition_.notifyAll();
   }
