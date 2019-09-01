@@ -78,8 +78,8 @@ struct ThreadData                                                               
   {
     *tid_ = muduo::CurrentThread::tid();                                                // 获取当前线程的tid，存放在Thread成员变量tid_中
     tid_ = NULL;                                                                        // ThreadData结构中的指针成员tid_置为空指针
-    latch_->countDown();                                                                // ??
-    latch_ = NULL;                                                                      // ??
+    latch_->countDown();                                                                // 计数键1
+    latch_ = NULL;
 
     muduo::CurrentThread::t_threadName = name_.empty() ? "muduoThread" : name_.c_str(); // 这里的name_怎么会为空呢？？在此之前muduo::CurrentThread::t_threadName为unknown
     ::prctl(PR_SET_NAME, muduo::CurrentThread::t_threadName);                           // 设置进程的名字为t_hreadName
@@ -191,7 +191,7 @@ void Thread::start()
   }
   else                                                                                      // 线程创建成功
   {
-    latch_.wait();                                                                          // ??
+    latch_.wait();                                                                          // 等待计数器减为0
     assert(tid_ > 0);                                                                       // 线程创建成功之后，tid_必然 > 0
   }
 }

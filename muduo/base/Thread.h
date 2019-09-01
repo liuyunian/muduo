@@ -45,7 +45,7 @@ class Thread : noncopyable                                      // 封装线程�
   pid_t      tid_;                                              // 线程真实id
   ThreadFunc func_;                                             // 线程所要执行的任务函数
   string     name_;                                             // 线程名
-  CountDownLatch latch_;                                        // 线程锁 ??
+  CountDownLatch latch_;                                        // 计数器门闩类，用于主线程与其他线程同步
 
   static AtomicInt32 numCreated_;                               // 32位原子类型，用来记录该类实例的个数，也就是记录多少个线程
 };
