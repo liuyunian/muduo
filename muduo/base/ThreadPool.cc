@@ -24,7 +24,7 @@ ThreadPool::ThreadPool(const string& nameArg)
 
 ThreadPool::~ThreadPool()
 {
-  if (running_)
+  if (running_)                                                                 // 析构函数中，如果线程池正在运行，就停止
   {
     stop();
   }
@@ -34,16 +34,16 @@ void ThreadPool::start(int numThreads)
 {
   assert(threads_.empty());
   running_ = true;
-  threads_.reserve(numThreads);
+  threads_.reserve(numThreads);                                                 // 设置存放线程对象的vector的容量
   for (int i = 0; i < numThreads; ++i)
   {
     char id[32];
     snprintf(id, sizeof id, "%d", i+1);
     threads_.emplace_back(new muduo::Thread(
-          std::bind(&ThreadPool::runInThread, this), name_+id));
+          std::bind(&ThreadPool::runInThread, this), name_+id));                // 创建Thread线程对象，并将其添加到容器中，线程执行的函数是runInThread
     threads_[i]->start();
   }
-  if (numThreads == 0 && threadInitCallback_)
+  if (numThreads == 0 && threadInitCallback_)                                   // 如果指定线程池的大小为0，并且threadInitCallback_不为空的话，就执行threadInitCallback_
   {
     threadInitCallback_();
   }
@@ -68,23 +68,23 @@ size_t ThreadPool::queueSize() const
   return queue_.size();
 }
 
-void ThreadPool::run(Task task)
+void ThreadPool::run(Task task)                                                     // 向任务队列中添加任务
 {
-  if (threads_.empty())
+  if (threads_.empty())                                                             // 如果线程池中没有线程，那么就在添加任务的线程中执行该任务
   {
     task();
   }
   else
   {
     MutexLockGuard lock(mutex_);
-    while (isFull())
+    while (isFull())                                                                // 当任务队列已满时，阻塞等待唤醒
     {
       notFull_.wait();
     }
     assert(!isFull());
 
     queue_.push_back(std::move(task));
-    notEmpty_.notify();
+    notEmpty_.notify();                                                             // 唤醒线程池中的线程，取任务执行
   }
 }
 
@@ -92,7 +92,7 @@ ThreadPool::Task ThreadPool::take()
 {
   MutexLockGuard lock(mutex_);
   // always use a while-loop, due to spurious wakeup
-  while (queue_.empty() && running_)
+  while (queue_.empty() && running_)                                                // 当任务队列为空，线程池处于运行状态时，线程阻塞，等待唤醒
   {
     notEmpty_.wait();
   }
@@ -103,7 +103,7 @@ ThreadPool::Task ThreadPool::take()
     queue_.pop_front();
     if (maxQueueSize_ > 0)
     {
-      notFull_.notify();
+      notFull_.notify();                                                            // 取走任务后，任务队列不满，唤醒添加任务的线程
     }
   }
   return task;
@@ -125,7 +125,7 @@ void ThreadPool::runInThread()
     }
     while (running_)
     {
-      Task task(take());
+      Task task(take());                                                            // 从任务队列中取任务
       if (task)
       {
         task();
