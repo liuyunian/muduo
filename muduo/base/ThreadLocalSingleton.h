@@ -15,29 +15,29 @@ namespace muduo
 {
 
 template<typename T>
-class ThreadLocalSingleton : noncopyable
+class ThreadLocalSingleton : noncopyable                                        // 该类的意义是线程特定的单例类
 {
  public:
   ThreadLocalSingleton() = delete;
   ~ThreadLocalSingleton() = delete;
 
-  static T& instance()
+  static T& instance()                                                          // 获取唯一的T实例
   {
-    if (!t_value_)
+    if (!t_value_)                                                              // 如果之前没有实例化T
     {
       t_value_ = new T();
-      deleter_.set(t_value_);
+      deleter_.set(t_value_);                                                   // 将Deleter对象创建的key与t_value_所指向T实例关联
     }
     return *t_value_;
   }
 
-  static T* pointer()
+  static T* pointer()                                                           // 获取唯一的T实例指针
   {
     return t_value_;
   }
 
  private:
-  static void destructor(void* obj)
+  static void destructor(void* obj)                                             // pthread_key_create()中注册的用于销毁线程特定数据的函数
   {
     assert(obj == t_value_);
     typedef char T_must_be_complete_type[sizeof(T) == 0 ? -1 : 1];
@@ -68,15 +68,15 @@ class ThreadLocalSingleton : noncopyable
     pthread_key_t pkey_;
   };
 
-  static __thread T* t_value_;
-  static Deleter deleter_;
+  static __thread T* t_value_;                                                  // 用来存放线程特定的单例类的唯一实例
+  static Deleter deleter_;                                                      // 用于析构T的实例
 };
 
 template<typename T>
-__thread T* ThreadLocalSingleton<T>::t_value_ = 0;
+__thread T* ThreadLocalSingleton<T>::t_value_ = 0;                              // 定义并初始化
 
 template<typename T>
-typename ThreadLocalSingleton<T>::Deleter ThreadLocalSingleton<T>::deleter_;
+typename ThreadLocalSingleton<T>::Deleter ThreadLocalSingleton<T>::deleter_;    // 定义并初始化
 
 }  // namespace muduo
 #endif  // MUDUO_BASE_THREADLOCALSINGLETON_H
