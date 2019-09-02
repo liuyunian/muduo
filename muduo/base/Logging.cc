@@ -35,26 +35,26 @@ class LoggerImpl
 };
 */
 
-__thread char t_errnobuf[512];
+__thread char t_errnobuf[512];                                                                      // 线程特定数据
 __thread char t_time[64];
 __thread time_t t_lastSecond;
 
-const char* strerror_tl(int savedErrno)
+const char* strerror_tl(int savedErrno)                                                             // 获取errno对应的字符串说明
 {
   return strerror_r(savedErrno, t_errnobuf, sizeof t_errnobuf);
 }
 
-Logger::LogLevel initLogLevel()
+Logger::LogLevel initLogLevel()                                                                     // 初始化日志级别
 {
-  if (::getenv("MUDUO_LOG_TRACE"))
+  if (::getenv("MUDUO_LOG_TRACE"))                                                                  // 如果定义了环境变量MUDUO_LOG_TRACE，日志级别设置为TRACE
     return Logger::TRACE;
-  else if (::getenv("MUDUO_LOG_DEBUG"))
+  else if (::getenv("MUDUO_LOG_DEBUG"))                                                             // 如果定义了环境变量MUDUO_LOG_DEBUG，日志级别设置为DEBUG
     return Logger::DEBUG;
   else
-    return Logger::INFO;
+    return Logger::INFO;                                                                            // 没有进行环境变量定义的话，默认的日志级别为INFO
 }
 
-Logger::LogLevel g_logLevel = initLogLevel();
+Logger::LogLevel g_logLevel = initLogLevel();                                                       // 保存设置的日志级别    
 
 const char* LogLevelName[Logger::NUM_LOG_LEVELS] =
 {
@@ -64,9 +64,9 @@ const char* LogLevelName[Logger::NUM_LOG_LEVELS] =
   "WARN  ",
   "ERROR ",
   "FATAL ",
-};
+};                                                                                                  // 日志级别，字符串数组，用枚举元素的值作为数组index
 
-// helper class for known string length at compile time
+// helper class for known string length at compile time                                             // 帮助类，为了知道字符串的长度和编译时间
 class T
 {
  public:
