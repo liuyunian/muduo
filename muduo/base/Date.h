@@ -20,7 +20,7 @@ namespace muduo
 /// This class is immutable.
 /// It's recommended to pass it by value, since it's passed in register on x64.
 ///
-class Date : public muduo::copyable
+class Date : public muduo::copyable                                             // 对日期进行封装
           // public boost::less_than_comparable<Date>,
           // public boost::equality_comparable<Date>
 {
