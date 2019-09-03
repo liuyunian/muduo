@@ -33,7 +33,7 @@ class Logger                                                                    
   {
    public:
     template<int N>                                                                     // 构造函数还能是模板函数？？，参数是char数组
-    SourceFile(const char (&arr)[N])                                                    // 两个构造函数有什么区别呢？
+    SourceFile(const char (&arr)[N])                                                    // 用于接收字符串常量 -- "liuyunian"
       : data_(arr),
         size_(N-1)
     {
@@ -45,7 +45,7 @@ class Logger                                                                    
       }
     }
 
-    explicit SourceFile(const char* filename)
+    explicit SourceFile(const char* filename)                                           // 用于接收字符串变量 -- const char * str = "liuyunian"
       : data_(filename)
     {
       const char* slash = strrchr(filename, '/');
@@ -71,11 +71,11 @@ class Logger                                                                    
   static LogLevel logLevel();
   static void setLogLevel(LogLevel level);                                              // 设置日志级别
 
-  typedef void (*OutputFunc)(const char* msg, int len);
-  typedef void (*FlushFunc)();
-  static void setOutput(OutputFunc);
-  static void setFlush(FlushFunc);
-  static void setTimeZone(const TimeZone& tz);
+  typedef void (*OutputFunc)(const char* msg, int len);                                 // 函数指针，用于指向输出函数
+  typedef void (*FlushFunc)();                                                          // 函数指针，用于指向刷新函数
+  static void setOutput(OutputFunc);                                                    // 设置输出函数，参数是一个指向输出函数的函数指针
+  static void setFlush(FlushFunc);                                                      // 设置刷新函数，参数是一个指向刷新函数函数指针
+  static void setTimeZone(const TimeZone& tz);                                          // 设置时区
 
  private:
 
@@ -87,10 +87,10 @@ class Impl                                                                      
   void formatTime();
   void finish();
 
-  Timestamp time_;
+  Timestamp time_;                                                                      // 记录打印日志时的时间戳
   LogStream stream_;                                                                    // LogStream对象
-  LogLevel level_;
-  int line_;
+  LogLevel level_;                                                                      // 日志级别
+  int line_;                                                                            // 用于记录日志信息所在的行号
   SourceFile basename_;                                                                 // 用于记录日志信息所在的文件
 };
 
