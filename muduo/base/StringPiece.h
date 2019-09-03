@@ -31,8 +31,8 @@
 //
 // Author: Sanjay Ghemawat
 //
-// A string like object that points into another piece of memory.
-// Useful for providing an interface that allows clients to easily
+// A string like object that points into another piece of memory.                   -- 指向另一块内存的字符串（类似于对象）
+// Useful for providing an interface that allows clients to easily                  -- 提供了一个允许客户端容易的传递const char *和string类型接口
 // pass in either a "const char*" or a "string".
 //
 // Arghh!  I wish C++ literals were automatically of type "string".
@@ -48,15 +48,15 @@
 namespace muduo
 {
 
-// For passing C-style string argument to a function.
-class StringArg // copyable
+// For passing C-style string argument to a function.                               -- 为了向一个函数传递C风格的字符串
+class StringArg // copyable                                                         -- 可以拷贝
 {
  public:
-  StringArg(const char* str)
+  StringArg(const char* str)                                                        // 接收const char *类型的字符串
     : str_(str)
   { }
 
-  StringArg(const string& str)
+  StringArg(const string& str)                                                      // 既可以接收const char *也可以接收std::string类型字符串
     : str_(str.c_str())
   { }
 
@@ -68,11 +68,11 @@ class StringArg // copyable
 
 class StringPiece {
  private:
-  const char*   ptr_;
-  int           length_;
+  const char*   ptr_;                                                               // const char * 风格存放字符串
+  int           length_;                                                            // 字符串长度
 
  public:
-  // We provide non-explicit singleton constructors so users can pass
+  // We provide non-explicit singleton constructors so users can pass               -- 提供了单参数的non-explicit构造函数，所以用户可以在需要传递const char *或者string地方使用StringPiece
   // in a "const char*" or a "string" wherever a "StringPiece" is
   // expected.
   StringPiece()
@@ -92,7 +92,7 @@ class StringPiece {
   // typically a mistake to pass data() to a routine that expects a NUL
   // terminated string.  Use "as_string().c_str()" if you really need to do
   // this.  Or better yet, change your routine so it does not rely on NUL
-  // termination.
+  // termination.                                                                   // 操作函数
   const char* data() const { return ptr_; }
   int size() const { return length_; }
   bool empty() const { return length_ == 0; }
@@ -112,20 +112,20 @@ class StringPiece {
 
   char operator[](int i) const { return ptr_[i]; }
 
-  void remove_prefix(int n) {
+  void remove_prefix(int n) {                                                       // 移除0-n-1前n个字符
     ptr_ += n;
     length_ -= n;
   }
 
-  void remove_suffix(int n) {
+  void remove_suffix(int n) {                                                       // 移除后n个字符
     length_ -= n;
   }
 
-  bool operator==(const StringPiece& x) const {
+  bool operator==(const StringPiece& x) const {                                     // 判断相等的条件 -- 字符串长度相等，字符串每个字符都相同
     return ((length_ == x.length_) &&
             (memcmp(ptr_, x.ptr_, length_) == 0));
   }
-  bool operator!=(const StringPiece& x) const {
+  bool operator!=(const StringPiece& x) const {                                     // 判断不等的条件 -- 借助重载的==运算，之后取反
     return !(*this == x);
   }
 

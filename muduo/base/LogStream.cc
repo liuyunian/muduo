@@ -35,38 +35,38 @@ namespace muduo
 namespace detail
 {
 
-const char digits[] = "9876543210123456789";
-const char* zero = digits + 9;
-static_assert(sizeof(digits) == 20, "wrong number of digits");
+const char digits[] = "9876543210123456789";                                            // 十进制数字数组，
+const char* zero = digits + 9;                                                  
+static_assert(sizeof(digits) == 20, "wrong number of digits");                          // 算上尾部的\0是20字节
 
-const char digitsHex[] = "0123456789ABCDEF";
-static_assert(sizeof digitsHex == 17, "wrong number of digitsHex");
+const char digitsHex[] = "0123456789ABCDEF";                                            // 十六进制数字数组
+static_assert(sizeof digitsHex == 17, "wrong number of digitsHex");                     // 算上尾部的\0是17字节
 
-// Efficient Integer to String Conversions, by Matthew Wilson.
+// Efficient Integer to String Conversions, by Matthew Wilson.                          -- 高效的将整型转换成字符串函数
 template<typename T>
-size_t convert(char buf[], T value)
+size_t convert(char buf[], T value)                                                     //  
 {
   T i = value;
   char* p = buf;
 
   do
   {
-    int lsd = static_cast<int>(i % 10);
+    int lsd = static_cast<int>(i % 10);                                                 // 取最后一位
     i /= 10;
-    *p++ = zero[lsd];
-  } while (i != 0);
+    *p++ = zero[lsd];                                                                   // *p = zero[lsd]; ++p;
+  } while (i != 0);                                                                     // 从数字的低位取到高位
 
-  if (value < 0)
-  {
+  if (value < 0)                                                                        // 如果为负数，最后填一个负号
+  { 
     *p++ = '-';
   }
   *p = '\0';
-  std::reverse(buf, p);
+  std::reverse(buf, p);                                                                 // 字符串翻转
 
   return p - buf;
 }
 
-size_t convertHex(char buf[], uintptr_t value)
+size_t convertHex(char buf[], uintptr_t value)                                          // 将16进制数转换成字符串，存放在buf中，思路同十进制整型的转换
 {
   uintptr_t i = value;
   char* p = buf;
@@ -223,83 +223,83 @@ void FixedBuffer<SIZE>::cookieEnd()
 
 void LogStream::staticCheck()
 {
-  static_assert(kMaxNumericSize - 10 > std::numeric_limits<double>::digits10,
+  static_assert(kMaxNumericSize - 10 > std::numeric_limits<double>::digits10,           // std::numeric_limits<double>::digits10 -- double类型数据在十进制下的最大位数 -- 15位
                 "kMaxNumericSize is large enough");
-  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long double>::digits10,
+  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long double>::digits10,      // std::numeric_limits<long double>::digits10 -- long double类型数据在十进制下的最大位数 -- 15位
                 "kMaxNumericSize is large enough");
-  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long>::digits10,
+  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long>::digits10,             // std::numeric_limits<long>::digits10 -- long类型数据在十进制下的最大位数 -- 9位
                 "kMaxNumericSize is large enough");
-  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long long>::digits10,
+  static_assert(kMaxNumericSize - 10 > std::numeric_limits<long long>::digits10,        // std::numeric_limits<long long>::digits10 -- long long类型数据在十进制下的最大位数
                 "kMaxNumericSize is large enough");
 }
 
 template<typename T>
 void LogStream::formatInteger(T v)
 {
-  if (buffer_.avail() >= kMaxNumericSize)
+  if (buffer_.avail() >= kMaxNumericSize)                                               // 如果缓冲区的可用空间大于等于数字所占的最大位数
   {
-    size_t len = convert(buffer_.current(), v);
-    buffer_.add(len);
+    size_t len = convert(buffer_.current(), v);                                         // 将整型数据转换成字符串类型
+    buffer_.add(len);                                                                   // 移动指针cur_，让其指向空闲的位置
   }
 }
 
 LogStream& LogStream::operator<<(short v)
 {
-  *this << static_cast<int>(v);
+  *this << static_cast<int>(v);                                                         // 将short类型转化成int类型，再调用operator<<(int v)
   return *this;
 }
 
 LogStream& LogStream::operator<<(unsigned short v)
 {
-  *this << static_cast<unsigned int>(v);
+  *this << static_cast<unsigned int>(v);                                                // 将unsigned short类型转化成int类型，再调用operator<<(int v)
   return *this;
 }
 
 LogStream& LogStream::operator<<(int v)
 {
-  formatInteger(v);
+  formatInteger(v);                                                                     // 格式化整型
   return *this;
 }
 
 LogStream& LogStream::operator<<(unsigned int v)
 {
-  formatInteger(v);
+  formatInteger(v);                                                                     // 处理方式同int类型
   return *this;
 }
 
 LogStream& LogStream::operator<<(long v)
 {
-  formatInteger(v);
+  formatInteger(v);                                                                     // 处理方式同int类型
   return *this;
 }
 
 LogStream& LogStream::operator<<(unsigned long v)
 {
-  formatInteger(v);
+  formatInteger(v);                                                                     // 处理方式同int类型
   return *this;
 }
 
 LogStream& LogStream::operator<<(long long v)
 {
-  formatInteger(v);
+  formatInteger(v);                                                                     // 处理方式同int类型
   return *this;
 }
 
 LogStream& LogStream::operator<<(unsigned long long v)
 {
-  formatInteger(v);
+  formatInteger(v);                                                                     // 处理方式同int类型
   return *this;
 }
 
-LogStream& LogStream::operator<<(const void* p)
+LogStream& LogStream::operator<<(const void* p)                                         // 输出指针变量的值，格式：0x124e123
 {
-  uintptr_t v = reinterpret_cast<uintptr_t>(p);
+  uintptr_t v = reinterpret_cast<uintptr_t>(p);                                         // 强制类型，将void *转换成uintptr_t
   if (buffer_.avail() >= kMaxNumericSize)
   {
     char* buf = buffer_.current();
     buf[0] = '0';
     buf[1] = 'x';
-    size_t len = convertHex(buf+2, v);
+    size_t len = convertHex(buf+2, v);                                                  // 将16进制数转换成字符串
     buffer_.add(len+2);
   }
   return *this;
@@ -310,7 +310,7 @@ LogStream& LogStream::operator<<(double v)
 {
   if (buffer_.avail() >= kMaxNumericSize)
   {
-    int len = snprintf(buffer_.current(), kMaxNumericSize, "%.12g", v);
+    int len = snprintf(buffer_.current(), kMaxNumericSize, "%.12g", v);                 // 使用snprintf将double浮点数转换成字符串
     buffer_.add(len);
   }
   return *this;
