@@ -14,7 +14,7 @@ namespace muduo
 {
 
 // TimeZone for 1970~2030
-class TimeZone : public muduo::copyable
+class TimeZone : public muduo::copyable                                         // 时区类，方便时区之间的转换，以及时令之间的转换
 {
  public:
   explicit TimeZone(const char* zonefile);
