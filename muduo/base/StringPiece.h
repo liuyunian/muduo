@@ -140,7 +140,7 @@ class StringPiece {
   STRINGPIECE_BINARY_PREDICATE(>,  >);
 #undef STRINGPIECE_BINARY_PREDICATE
 
-  int compare(const StringPiece& x) const {
+  int compare(const StringPiece& x) const {                                         // 比较两个StringPiece对象，返回1、0、-1表示大于、等于、小于
     int r = memcmp(ptr_, x.ptr_, length_ < x.length_ ? length_ : x.length_);
     if (r == 0) {
       if (length_ < x.length_) r = -1;
@@ -149,16 +149,16 @@ class StringPiece {
     return r;
   }
 
-  string as_string() const {
+  string as_string() const {                                                        // 将封装的字符串转换成std::string格式
     return string(data(), size());
   }
 
-  void CopyToString(string* target) const {
+  void CopyToString(string* target) const {                                         // 将疯转的字符串拷贝到一个std::string对象中
     target->assign(ptr_, length_);
   }
 
   // Does "this" start with "x"
-  bool starts_with(const StringPiece& x) const {
+  bool starts_with(const StringPiece& x) const {                                    // 判断是否是以StringPiece对象x开始
     return ((length_ >= x.length_) && (memcmp(ptr_, x.ptr_, x.length_) == 0));
   }
 };

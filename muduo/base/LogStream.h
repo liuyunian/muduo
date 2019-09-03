@@ -55,7 +55,7 @@ class FixedBuffer : noncopyable                                                 
   void add(size_t len) { cur_ += len; }                                             // 向后移动cur_所指向的位置
 
   void reset() { cur_ = data_; }                                                    // 重置cur_指向的位置
-  void bzero() { memZero(data_, sizeof data_); }
+  void bzero() { memZero(data_, sizeof data_); }                                    // 将缓冲区中的数据清0
 
   // for used by GDB
   const char* debugString();
@@ -153,22 +153,22 @@ class LogStream : noncopyable                                                   
     return *this;
   }
 
-  void append(const char* data, int len) { buffer_.append(data, len); }
-  const Buffer& buffer() const { return buffer_; }
-  void resetBuffer() { buffer_.reset(); }
+  void append(const char* data, int len) { buffer_.append(data, len); }             // 向缓冲区中追加字符串，调用的是FixedBuffer::append
+  const Buffer& buffer() const { return buffer_; }                                  // 返回成员变量buffer_
+  void resetBuffer() { buffer_.reset(); }                                           // 将buffer_缓冲区清空
 
  private:
-  void staticCheck();
+  void staticCheck();                                                               // 检查kMaxNumericSize是否足够表示整型、浮点型数据长度
 
   template<typename T>
-  void formatInteger(T);
+  void formatInteger(T);                                                            // 格式化整型数据
 
   Buffer buffer_;
 
-  static const int kMaxNumericSize = 32;                                                // 数字所占的最大位数
+  static const int kMaxNumericSize = 32;                                            // 数字所占的最大位数
 };
 
-class Fmt // : noncopyable
+class Fmt // : noncopyable                                                          // 这个类有什么用呢？
 {
  public:
   template<typename T>
