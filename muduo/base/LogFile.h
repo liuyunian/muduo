@@ -29,12 +29,12 @@ class LogFile : noncopyable                                                 // �
           int checkEveryN = 1024);                                          // 指定计数器count_比较标准
   ~LogFile();
 
-  void append(const char* logline, int len);                                // 
+  void append(const char* logline, int len);                                // 加锁方式向日志文件追加内容
   void flush();                                                             // 刷新缓冲区
-  bool rollFile();                                                          // 
+  bool rollFile();                                                          // 切换日志文件
 
  private:
-  void append_unlocked(const char* logline, int len);                       // 无锁方式
+  void append_unlocked(const char* logline, int len);                       // 无锁方式向日志文件追加内容
 
   static string getLogFileName(const string& basename, time_t* now);        // 获取日志文件的名称
 
@@ -49,7 +49,7 @@ class LogFile : noncopyable                                                 // �
   time_t startOfPeriod_;                                                    // 开始记录日志的时间
   time_t lastRoll_;                                                         // 上一次日志滚动的时间
   time_t lastFlush_;                                                        // 上一次日志写入文件的时间
-  std::unique_ptr<FileUtil::AppendFile> file_;
+  std::unique_ptr<FileUtil::AppendFile> file_;                              // AppendFile类智能指针
 
   const static int kRollPerSeconds_ = 60*60*24;                             // 表示24小时
 };

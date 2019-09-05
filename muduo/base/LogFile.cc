@@ -30,10 +30,10 @@ LogFile::LogFile(const string& basename,
     lastFlush_(0)
 {
   assert(basename.find('/') == string::npos);                                // 断言basename中不包含'/'
-  rollFile();                                                                // 
+  rollFile();
 }
 
-LogFile::~LogFile() = default;
+LogFile::~LogFile() = default;                                              // 采用编译器提供的析构函数体
 
 void LogFile::append(const char* logline, int len)
 {
@@ -65,23 +65,23 @@ void LogFile::append_unlocked(const char* logline, int len)
 {
   file_->append(logline, len);
 
-  if (file_->writtenBytes() > rollSize_)
+  if (file_->writtenBytes() > rollSize_)                                    // 如果已向日志文件写入的字节数大于日志滚动门限值，此时应该进行日志滚动
   {
     rollFile();
   }
   else
   {
-    ++count_;
-    if (count_ >= checkEveryN_)
+    ++count_;                                                               // 每调用一次LogFile::append()获取LogFile::append_unlocked()，count_计数器都会加1
+    if (count_ >= checkEveryN_)                                             // 如果count_计数器达到了门限值，需要判断是否进行flush(将内核输出缓存区的内容写到硬盘文件上)
     {
       count_ = 0;
       time_t now = ::time(NULL);
       time_t thisPeriod_ = now / kRollPerSeconds_ * kRollPerSeconds_;
-      if (thisPeriod_ != startOfPeriod_)
+      if (thisPeriod_ != startOfPeriod_)                                    // 表示到了下一天的0点，此时需要进行日志滚动
       {
         rollFile();
       }
-      else if (now - lastFlush_ > flushInterval_)
+      else if (now - lastFlush_ > flushInterval_)                           // 时间间隔大于刷新间隔，此时要进行flush
       {
         lastFlush_ = now;
         file_->flush();
@@ -96,12 +96,12 @@ bool LogFile::rollFile()
   string filename = getLogFileName(basename_, &now);
   time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;                     // 记录当天0点对应时间
 
-  if (now > lastRoll_)
+  if (now > lastRoll_)                                                          // 当前的时间大于上一次日志滚动的时间
   {
     lastRoll_ = now;
     lastFlush_ = now;
     startOfPeriod_ = start;
-    file_.reset(new FileUtil::AppendFile(filename));
+    file_.reset(new FileUtil::AppendFile(filename));                            // unique_ptr智能指针ret()函数先释放原来指向的对象，在指向新new出来的对象
     return true;
   }
   return false;
@@ -116,7 +116,7 @@ string LogFile::getLogFileName(const string& basename, time_t* now)
   char timebuf[32];                                                             // 保存字符串格式的当前时间
   struct tm tm;
   *now = time(NULL);                                                            // 获取当前时间
-  gmtime_r(now, &tm); // FIXME: localtime_r ?                                   -- 当前时间用struct tm结构中保存
+  gmtime_r(now, &tm); // FIXME: localtime_r ?                                   -- 当前时间用struct tm结构中保存，gmtime()和gmtime_r()区别，gmtime_r()是线程安全的，gmtime()不是线程安全的
   strftime(timebuf, sizeof timebuf, ".%Y%m%d-%H%M%S.", &tm);                    // 使用strftime将struct tm结构保存的当前时间转换成字符串格式 -- %Y年、%m月、%d日-%H时、%M分、%S秒
   filename += timebuf;
 

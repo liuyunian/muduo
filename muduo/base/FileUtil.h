@@ -71,7 +71,7 @@ class AppendFile : noncopyable                                                  
 
   void flush();
 
-  off_t writtenBytes() const { return writtenBytes_; }
+  off_t writtenBytes() const { return writtenBytes_; }                              // 获取已向文件写入的字节数
 
  private:
 
@@ -79,7 +79,7 @@ class AppendFile : noncopyable                                                  
 
   FILE* fp_;
   char buffer_[64*1024];
-  off_t writtenBytes_;
+  off_t writtenBytes_;                                                              // 记录已向日志文件中写入的字节数
 };
 
 }  // namespace FileUtil

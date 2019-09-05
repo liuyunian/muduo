@@ -31,8 +31,8 @@ FileUtil::AppendFile::~AppendFile()
 
 void FileUtil::AppendFile::append(const char* logline, const size_t len)
 {
-  size_t n = write(logline, len);
-  size_t remain = len - n;
+  size_t n = write(logline, len);                                                                       // 这里的write()并不是使用的系统调用，而是封装的fwrite_unlocked()函数
+  size_t remain = len - n;                                                                              // remain表示剩余没有写入的字节数     
   while (remain > 0)
   {
     size_t x = write(logline + n, remain);
@@ -52,7 +52,7 @@ void FileUtil::AppendFile::append(const char* logline, const size_t len)
   writtenBytes_ += len;
 }
 
-void FileUtil::AppendFile::flush()
+void FileUtil::AppendFile::flush()                                                                      // 使用fflush刷新缓冲区
 {
   ::fflush(fp_);
 }
@@ -60,7 +60,7 @@ void FileUtil::AppendFile::flush()
 size_t FileUtil::AppendFile::write(const char* logline, size_t len)
 {
   // #undef fwrite_unlocked
-  return ::fwrite_unlocked(logline, 1, len, fp_);
+  return ::fwrite_unlocked(logline, 1, len, fp_);                                                       // 无锁的方式写文件
 }
 
 FileUtil::ReadSmallFile::ReadSmallFile(StringArg filename)
