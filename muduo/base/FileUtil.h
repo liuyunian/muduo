@@ -17,7 +17,7 @@ namespace muduo
 namespace FileUtil
 {
 
-// read small file < 64KB
+// read small file < 64KB                                                           // 读取小文件 < 64k字节
 class ReadSmallFile : noncopyable
 {
  public:
@@ -26,19 +26,19 @@ class ReadSmallFile : noncopyable
 
   // return errno
   template<typename String>
-  int readToString(int maxSize,
-                   String* content,
-                   int64_t* fileSize,
-                   int64_t* modifyTime,
-                   int64_t* createTime);
+  int readToString(int maxSize,                                                     // maxSize读取文件内容的最大数
+                   String* content,                                                 // 用于存放读取文件内容
+                   int64_t* fileSize,                                               // 记录文件大小
+                   int64_t* modifyTime,                                             // 记录文件的修改时间
+                   int64_t* createTime);                                            // 记录文件的创建时间
 
   /// Read at maxium kBufferSize into buf_
   // return errno
-  int readToBuffer(int* size);
+  int readToBuffer(int* size);                                                      // 读取文件内容到buffer缓冲区
 
   const char* buffer() const { return buf_; }
 
-  static const int kBufferSize = 64*1024;
+  static const int kBufferSize = 64*1024;                                           // buffer缓冲区的大小
 
  private:
   int fd_;
@@ -59,8 +59,8 @@ int readFile(StringArg filename,
   return file.readToString(maxSize, content, fileSize, modifyTime, createTime);
 }
 
-// not thread safe
-class AppendFile : noncopyable
+// not thread safe                                                                  -- 非线程安全
+class AppendFile : noncopyable                                                      // 向文件中追加内容
 {
  public:
   explicit AppendFile(StringArg filename);

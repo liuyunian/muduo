@@ -30,7 +30,7 @@ LogFile::LogFile(const string& basename,
     lastFlush_(0)
 {
   assert(basename.find('/') == string::npos);                                // 断言basename中不包含'/'
-  rollFile();                                                               // 
+  rollFile();                                                                // 
 }
 
 LogFile::~LogFile() = default;
@@ -94,7 +94,7 @@ bool LogFile::rollFile()
 {
   time_t now = 0;
   string filename = getLogFileName(basename_, &now);
-  time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;
+  time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;                     // 记录当天0点对应时间
 
   if (now > lastRoll_)
   {
@@ -120,14 +120,14 @@ string LogFile::getLogFileName(const string& basename, time_t* now)
   strftime(timebuf, sizeof timebuf, ".%Y%m%d-%H%M%S.", &tm);                    // 使用strftime将struct tm结构保存的当前时间转换成字符串格式 -- %Y年、%m月、%d日-%H时、%M分、%S秒
   filename += timebuf;
 
-  filename += ProcessInfo::hostname();
+  filename += ProcessInfo::hostname();                                          // 获取主机名
 
   char pidbuf[32];
-  snprintf(pidbuf, sizeof pidbuf, ".%d", ProcessInfo::pid());
+  snprintf(pidbuf, sizeof pidbuf, ".%d", ProcessInfo::pid());                   // 进程id
   filename += pidbuf;
 
   filename += ".log";
 
-  return filename;
+  return filename;                                                              // 日志文件名：basename + 当前时间 + 主机名 + 进程id + .log                                                           
 }
 

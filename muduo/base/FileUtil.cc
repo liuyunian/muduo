@@ -64,7 +64,7 @@ size_t FileUtil::AppendFile::write(const char* logline, size_t len)
 }
 
 FileUtil::ReadSmallFile::ReadSmallFile(StringArg filename)
-  : fd_(::open(filename.c_str(), O_RDONLY | O_CLOEXEC)),
+  : fd_(::open(filename.c_str(), O_RDONLY | O_CLOEXEC)),                                                // 使用系统调用open()打开filename文件，打开的方式是只读，O_CLOEXEC表示子进程在执行exec()之后不继承父进程打开的文件描述符
     err_(0)
 {
   buf_[0] = '\0';
@@ -78,7 +78,7 @@ FileUtil::ReadSmallFile::~ReadSmallFile()
 {
   if (fd_ >= 0)
   {
-    ::close(fd_); // FIXME: check EINTR
+    ::close(fd_); // FIXME: check EINTR                                                                 -- 关闭文件描述符
   }
 }
 
@@ -90,8 +90,8 @@ int FileUtil::ReadSmallFile::readToString(int maxSize,
                                           int64_t* modifyTime,
                                           int64_t* createTime)
 {
-  static_assert(sizeof(off_t) == 8, "_FILE_OFFSET_BITS = 64");
-  assert(content != NULL);
+  static_assert(sizeof(off_t) == 8, "_FILE_OFFSET_BITS = 64");                                          // 编译时断言off_t字节数
+  assert(content != NULL);                                                                              // 断言用于保存读取文件内容content不为空指针
   int err = err_;
   if (fd_ >= 0)
   {
