@@ -48,10 +48,10 @@ namespace ProcessInfo                                               // 进程相
   int openedFiles();                                                // 获取进程当前打开的文件个数
   int maxOpenFiles();                                               // 获取进程打开文件的最大个数
 
-  struct CpuTime
+  struct CpuTime                                                    // 记录进程所占用的CPU时间
   {
-    double userSeconds;
-    double systemSeconds;
+    double userSeconds;                                             // 执行用户层所占用的CPU时间
+    double systemSeconds;                                           // 执行核心层所占用的CPU时间
 
     CpuTime() : userSeconds(0.0), systemSeconds(0.0) { }
 
@@ -59,8 +59,8 @@ namespace ProcessInfo                                               // 进程相
   };
   CpuTime cpuTime();
 
-  int numThreads();
-  std::vector<pid_t> threads();
+  int numThreads();                                                 // 获取进程中的线程数
+  std::vector<pid_t> threads();                                     // 获取进程中线程的真实ID -- tid
 }  // namespace ProcessInfo
 
 }  // namespace muduo

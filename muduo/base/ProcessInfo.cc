@@ -199,7 +199,7 @@ int ProcessInfo::openedFiles()
 int ProcessInfo::maxOpenFiles()
 {
   struct rlimit rl;
-  if (::getrlimit(RLIMIT_NOFILE, &rl))
+  if (::getrlimit(RLIMIT_NOFILE, &rl))                                                  // getrlimit()获取系统设定资源使用限制，RLIMIT_NOFILE -- 进程可以打开的最大文件描述符的数目
   {
     return openedFiles();
   }
@@ -225,7 +225,7 @@ ProcessInfo::CpuTime ProcessInfo::cpuTime()
 int ProcessInfo::numThreads()
 {
   int result = 0;
-  string status = procStatus();
+  string status = procStatus();                                                         // "/proc/self/status"文件中Threads:        1一行中是该进程有多少个线程的信息
   size_t pos = status.find("Threads:");
   if (pos != string::npos)
   {
@@ -238,7 +238,7 @@ std::vector<pid_t> ProcessInfo::threads()
 {
   std::vector<pid_t> result;
   t_pids = &result;
-  scanDir("/proc/self/task", taskDirFilter);
+  scanDir("/proc/self/task", taskDirFilter);                                            // "/proc/self/task"目录下记录着线程的tid，这里还是通过scandir()函数获取
   t_pids = NULL;
   std::sort(result.begin(), result.end());
   return result;
