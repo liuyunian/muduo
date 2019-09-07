@@ -251,7 +251,7 @@ LogStream& LogStream::operator<<(short v)
 
 LogStream& LogStream::operator<<(unsigned short v)
 {
-  *this << static_cast<unsigned int>(v);                                                // 将unsigned short类型转化成int类型，再调用operator<<(int v)
+  *this << static_cast<unsigned int>(v);                                                // 将unsigned short类型转化成unsigned int类型，再调用operator<<(unsigned int v)
   return *this;
 }
 

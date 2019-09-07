@@ -235,23 +235,20 @@ void Logger::setTimeZone(const TimeZone& tz)
         logger() -- 构造函数
         Impl() -- 构造函数
             formatTime()
+                stream_ << Timestamp                                                -- 打印时间
             CurrentThread::tid();
-            stream_ << tid
-            stream_ << loglevel
-                LogStream& operator<<(LogStream& s, T v)
-                    s.append();
-                        ...
-                T(const char* str, unsigned len) -- 构造函数
-            stream_ << errno
-                LogStream& operator<<(LogStream& s, const Logger::SourceFile& v)
-                    s.append();
-                        ...
-                SourceFile() -- 构造函数
+            stream_ << tid                                                          -- 线程tid
+            stream_ << loglevel                                                     -- 日志级别
+            if(errno != 0)
+            stream_ << errno                                                        -- errno信息
+                strerror_tl()
+            (loglevel = TRACE or DEBUG时)stream_ << func                            -- 日志所在的函数（仅用于调试）
         stream()
-        LogStream& operator<<(LogStream& s, const Fmt& fmt)
+        LogStream& operator<<(LogStream& s, const Fmt& fmt)                         -- 字符串信息
             ...
         ~Logger() -- 构造产生的是Logger临时对象，所以该语句执行完之后会析构Logger对象
             impl_.finish();
+                stream_ << " - " << basename_ << ':' << line_ << '\n';              -- 日志信息所在的文件和行号
             LogStream::buffer()
                 ...
             g_output() -- 输出函数，可以输出到stdout或者文件

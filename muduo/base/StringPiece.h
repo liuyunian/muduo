@@ -138,7 +138,7 @@ class StringPiece {
   STRINGPIECE_BINARY_PREDICATE(<=, <);
   STRINGPIECE_BINARY_PREDICATE(>=, >);
   STRINGPIECE_BINARY_PREDICATE(>,  >);
-#undef STRINGPIECE_BINARY_PREDICATE
+#undef STRINGPIECE_BINARY_PREDICATE                                                 // 实现 < > <= >=比较运算符
 
   int compare(const StringPiece& x) const {                                         // 比较两个StringPiece对象，返回1、0、-1表示大于、等于、小于
     int r = memcmp(ptr_, x.ptr_, length_ < x.length_ ? length_ : x.length_);

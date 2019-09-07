@@ -58,11 +58,11 @@ class FixedBuffer : noncopyable                                                 
   void bzero() { memZero(data_, sizeof data_); }                                    // 将缓冲区中的数据清0
 
   // for used by GDB
-  const char* debugString();
+  const char* debugString();                                                        // 将data_中存放的数据后加'\0'，转换成const char *字符串
   void setCookie(void (*cookie)()) { cookie_ = cookie; }
   // for used by unit test
-  string toString() const { return string(data_, length()); }
-  StringPiece toStringPiece() const { return StringPiece(data_, length()); }
+  string toString() const { return string(data_, length()); }                       // 将数据转换成std::string字符串
+  StringPiece toStringPiece() const { return StringPiece(data_, length()); }        // 将数据转换成StringPiece对象
 
  private:
   const char* end() const { return data_ + sizeof data_; }
@@ -168,7 +168,7 @@ class LogStream : noncopyable                                                   
   static const int kMaxNumericSize = 32;                                            // 数字所占的最大位数
 };
 
-class Fmt // : noncopyable                                                          // 这个类有什么用呢？
+class Fmt // : noncopyable                                                          // Logger::Impl::formatTime()中会用到该类
 {
  public:
   template<typename T>
