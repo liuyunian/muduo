@@ -112,7 +112,7 @@ inline double timeDifference(Timestamp high, Timestamp low)
 ///
 /// @return timestamp+seconds as Timestamp
 ///
-inline Timestamp addTime(Timestamp timestamp, double seconds)
+inline Timestamp addTime(Timestamp timestamp, double seconds)                               // 值传递而非引用传递
 {
   int64_t delta = static_cast<int64_t>(seconds * Timestamp::kMicroSecondsPerSecond);
   return Timestamp(timestamp.microSecondsSinceEpoch() + delta);

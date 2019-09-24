@@ -18,12 +18,12 @@ namespace muduo
 namespace net
 {
 
-class Timer;
+class Timer;                                                // 前向声明
 
 ///
-/// An opaque identifier, for canceling Timer.
+/// An opaque identifier, for canceling Timer.              -- 一个不透明的类，也就是向外部暴露，用于取消定时器
 ///
-class TimerId : public muduo::copyable
+class TimerId : public muduo::copyable                      // 可以拷贝
 {
  public:
   TimerId()
@@ -38,13 +38,13 @@ class TimerId : public muduo::copyable
   {
   }
 
-  // default copy-ctor, dtor and assignment are okay
+  // default copy-ctor, dtor and assignment are okay        -- 采用默认的拷贝构造函数，析构函数和赋值运算符函数
 
-  friend class TimerQueue;
+  friend class TimerQueue;                                  // 友元类 -- 在TimerQueue中可以访问TimerId类的private成员
 
  private:
-  Timer* timer_;
-  int64_t sequence_;
+  Timer* timer_;        // 定时器对象指针
+  int64_t sequence_;    // 定时器序号
 };
 
 }  // namespace net

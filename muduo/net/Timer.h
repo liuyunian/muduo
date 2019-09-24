@@ -21,7 +21,7 @@ namespace net
 {
 
 ///
-/// Internal class for timer event.
+/// Internal class for timer event.                                 // 提供timer event使用的内部类，不对外暴露，
 ///
 class Timer : noncopyable
 {
@@ -30,7 +30,7 @@ class Timer : noncopyable
     : callback_(std::move(cb)),
       expiration_(when),
       interval_(interval),
-      repeat_(interval > 0.0),
+      repeat_(interval > 0.0),                                      // 间隔时间大于0，表示需要重复触发
       sequence_(s_numCreated_.incrementAndGet())
   { }
 
@@ -39,22 +39,22 @@ class Timer : noncopyable
     callback_();
   }
 
-  Timestamp expiration() const  { return expiration_; }
+  Timestamp expiration() const  { return expiration_; }             // 获取到期时间
   bool repeat() const { return repeat_; }
-  int64_t sequence() const { return sequence_; }
+  int64_t sequence() const { return sequence_; }                    // 
 
-  void restart(Timestamp now);
+  void restart(Timestamp now);                                      // 重新开始定时
 
-  static int64_t numCreated() { return s_numCreated_.get(); }
+  static int64_t numCreated() { return s_numCreated_.get(); }       // ??
 
  private:
-  const TimerCallback callback_;
-  Timestamp expiration_;
-  const double interval_;
-  const bool repeat_;
-  const int64_t sequence_;
+  const TimerCallback callback_;    // 定时器到
+  Timestamp expiration_;            // 到期时间
+  const double interval_;           // 时间间隔
+  const bool repeat_;               // 是否是重复定时器
+  const int64_t sequence_;          // 定时器序号，每个定时器都有一个唯一的序号
 
-  static AtomicInt64 s_numCreated_;
+  static AtomicInt64 s_numCreated_; // 记录当前创建定时器的个数
 };
 
 }  // namespace net
