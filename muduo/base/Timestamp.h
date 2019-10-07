@@ -63,7 +63,7 @@ class Timestamp : public muduo::copyable,                                       
   /// Get time of now.
   ///
   static Timestamp now();																	// 获取当前时间
-  static Timestamp invalid()
+  static Timestamp invalid()                                                                // 返回无效的时间戳 -- 0
   {
     return Timestamp();
   }

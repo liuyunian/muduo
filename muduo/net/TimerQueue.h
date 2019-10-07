@@ -64,10 +64,10 @@ class TimerQueue : noncopyable
   void cancelInLoop(TimerId timerId);
 
   // called when timerfd alarms
-  void handleRead();
+  void handleRead();                                                        // timerfd_可读事件的回调函数
   // move out all expired timers
   std::vector<Entry> getExpired(Timestamp now);                             // 获取当前时间超时的定时器
-  void reset(const std::vector<Entry>& expired, Timestamp now);             // 
+  void reset(const std::vector<Entry>& expired, Timestamp now);             // 重置已到期的定时器（如果定时器是循环定时器）
 
   bool insert(Timer* timer);
 
@@ -78,9 +78,9 @@ class TimerQueue : noncopyable
   TimerList timers_;
 
   // for cancel()
-  ActiveTimerSet activeTimers_;         // timers_与activeTimers_中保存的是相同的数据，activeTimers_按照到期时间排序
-  bool callingExpiredTimers_; /* atomic */
-  ActiveTimerSet cancelingTimers_;      // 保存被取消的定时器
+  ActiveTimerSet activeTimers_;             // timers_与activeTimers_中保存的是相同的数据，activeTimers_按照到期时间排序
+  bool callingExpiredTimers_; /* atomic */  // 是否正处于处理超时定时器中
+  ActiveTimerSet cancelingTimers_;          // 保存被取消的定时器
 };
 
 }  // namespace net

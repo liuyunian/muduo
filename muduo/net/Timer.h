@@ -34,7 +34,7 @@ class Timer : noncopyable
       sequence_(s_numCreated_.incrementAndGet())
   { }
 
-  void run() const
+  void run() const                                                  // 执行定时到期的回调函数
   {
     callback_();
   }
@@ -45,10 +45,10 @@ class Timer : noncopyable
 
   void restart(Timestamp now);                                      // 重新开始定时
 
-  static int64_t numCreated() { return s_numCreated_.get(); }       // ??
+  static int64_t numCreated() { return s_numCreated_.get(); }
 
  private:
-  const TimerCallback callback_;    // 定时器到
+  const TimerCallback callback_;    // 定时器到期之后的回调函数
   Timestamp expiration_;            // 到期时间
   const double interval_;           // 时间间隔
   const bool repeat_;               // 是否是重复定时器

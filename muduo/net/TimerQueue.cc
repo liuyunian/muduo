@@ -29,6 +29,13 @@ namespace detail
 
 int createTimerfd()
 {
+
+    /**
+     * timerfd_create(2) timerfd_settime(2) timer_gettime(2)
+     * 定时函数
+     * @brief timerfd_create()函数将时间变成了一个文件描述符，在定时到期时，该“文件”变的可读，所以很方便的使用IO复用进行监管
+     * @param CLOCK_MONOTONIC 指定计时采用的的时间类型，CLOCK_MONOTONIC -- 以固定速率运行，不受系统时间影响；CLOCK_REALTIME -- 采用系统范围内的实时时钟
+    */
   int timerfd = ::timerfd_create(CLOCK_MONOTONIC,
                                  TFD_NONBLOCK | TFD_CLOEXEC);
   if (timerfd < 0)
@@ -95,9 +102,9 @@ TimerQueue::TimerQueue(EventLoop* loop)
     timers_(),
     callingExpiredTimers_(false)
 {
-  timerfdChannel_.setReadCallback(
+  timerfdChannel_.setReadCallback(                                              // 注册timerfd可读事件的回调函数
       std::bind(&TimerQueue::handleRead, this));
-  // we are always reading the timerfd, we disarm it with timerfd_settime.
+  // we are always reading the timerfd, we disarm it with timerfd_settime.      -- 使用timerfd_settime()解除
   timerfdChannel_.enableReading();
 }
 
@@ -109,7 +116,7 @@ TimerQueue::~TimerQueue()
   // do not remove channel, since we're in EventLoop::dtor();
   for (const Entry& timer : timers_)
   {
-    delete timer.second;
+    delete timer.second;                                                        // 使用的生指针所以需要delete
   }
 }
 
