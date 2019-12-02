@@ -61,8 +61,13 @@ class BoundedBlockingQueue : noncopyable                        // 无界阻塞�
     assert(!queue_.empty());
     T front(std::move(queue_.front()));
     queue_.pop_front();
+<<<<<<< HEAD
     notFull_.notify();                                      // 取出一个元素之后，队列非满，唤醒一个生产者线程
     return std::move(front);
+=======
+    notFull_.notify();
+    return front;
+>>>>>>> 0f3cb975510ea11d984f0fb03c8f5ea776c64f3a
   }
 
   bool empty() const                                        // 判断队列是否满
